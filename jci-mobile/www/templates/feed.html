@@ -1,0 +1,40 @@
+<ion-view view-title="Feed" class="feed-view" hide-nav-bar="true">
+    <ion-content>
+        <ion-refresher on-refresh="forceLoad()">
+        </ion-refresher>
+        <div ng-hide="online" style="background: red; color: #fff; text-align: center; text-transform: uppercase; font-size: 12px;">You're offline</div>
+
+        <div class="feed-cards-outer">
+            <div ng-if="items.length > 0" ng-repeat="(key, item)  in items" class="post-card-outer">
+                <div class="card-7" >
+                    <div class="card">
+                        <div class="row card-content-wrapper">
+                            <div class="col col-33 image-wrapper">
+                                <a class="card-image-anchor" ui-sref="app.post({ postId: post.id })">
+                                    <pre-img ratio="_1_1" helper-class="profile-post-image">
+                                        <img class="post-image" ng-src="{{ item.thumbnail[0] }}" style="width:100%" spinner-on-load>
+                                    </pre-img>
+                                </a>
+                            </div>
+                            <div class="col card-data">
+                                <a class="card-title-outer" ui-sref="app.post({ postId: post.id })">
+                                    <h2 class="card-title">{{item.title}}</h2>
+                                </a>
+                                <p class="desc">{{ item.content }}</p>
+                                <div class="actions-brief">cc
+                                    <a class="subdued">1,054 Likes</a>
+                                    <a ng-click="showComments(post)" class="subdued">2,003 Comments</a>
+                                    <a class="subdued">32,123 Shares</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <ion-infinite-scroll ng-if="canLoadMore" on-infinite="loadMoreData()" distance="2%">
+        </ion-infinite-scroll>
+        <div ng-hide="canLoadMore" style="background: #d0d0d0; color: #fff; text-align: center; text-transform: uppercase; font-size: 12px;">End of Results</div>
+    </ion-content>
+</ion-view>

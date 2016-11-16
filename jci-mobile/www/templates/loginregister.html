@@ -1,0 +1,13 @@
+<ion-view view-title="Playlist"  hide-nav-bar="true">
+    <ion-content>
+        <ion-refresher on-refresh="doRefresh()">
+        </ion-refresher>
+         <div ng-hide="online" style="background: red; color: #fff; text-align: center; text-transform: uppercase; font-size: 12px;">You're offline</div>
+        <h1>{{ name }}</h1>
+
+        <div class="feed row" ng-repeat="(key, item)  in items"  ng-hide="isEmpty(item)">
+            <div class="col">{{ key }}</div>
+            <div class="col" ng-style="item.status === 'new' ? {'background-color':'#eee'} : {}">{{ item.value }}</div>
+        </div>
+    </ion-content>
+</ion-view>

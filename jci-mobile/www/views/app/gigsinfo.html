@@ -1,0 +1,45 @@
+<ion-view class="gigs-view"  view-title="Gigs Info">
+
+  
+  <ion-content overflow-scroll="true" >
+  
+<!--   <div class="item item-divider ng-if="{{gigsupcoming !== null}}"">
+    Upcoming Gigs
+  </div> -->
+<div class="card-1">
+	<div class="list card">
+		<div class="item item-image">
+			<pre-img ratio="_8_5" helper-class="main-image">
+			  <img ng-src="{{ gigs.thumb }}" spinner-on-load>
+			</pre-img>
+		</div>
+		
+		<div class="item title" >
+			<b>{{ gigs.title }}</b>
+		</div>
+		
+		<div class="item item-icon-left assertive" >
+			<i class="icon ion-ios-calendar"></i>
+			{{gigs.date}} - {{gigs.time}}
+		</div>
+		<div class="item item-icon-left dark">
+			<i class="icon ion-ios-location"></i>
+			{{gigs.venue}},{{gigs.city}}
+		</div>
+		<div class="item item-icon-left dark">
+			<i class="icon ion-ios-mic"></i>
+			{{gigs.bands}}
+		</div>
+		
+		
+		<div class="item item-body item-text-wrap" ng-bind-html="gigs.description | unsafe">
+			{{gigs.description}}
+		</div>
+		
+	</div>
+  
+</div>
+
+</ion-content>
+
+</ion-view>
