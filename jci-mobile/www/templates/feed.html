@@ -3,7 +3,7 @@
         <ion-refresher on-refresh="forceLoad()">
         </ion-refresher>
         <div ng-hide="online" style="background: red; color: #fff; text-align: center; text-transform: uppercase; font-size: 12px;">You're offline</div>
-
+        <button class="button" ng-click="scheduleInstantNotification('hey')"> Prompt now </button>
         <div class="feed-cards-outer">
             <div ng-if="items.length > 0" ng-repeat="(key, item)  in items" class="post-card-outer">
                 <div class="card-7" >

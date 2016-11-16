@@ -1,4 +1,6 @@
 angular.module( 'starter.app.controllers', [
+    'ionic',
+    'ngCordova'
 ] )
 
 .controller( 'ProfileCtrl', function ( $scope, $ionicHistory, $state,
@@ -671,7 +673,8 @@ angular.module( 'starter.app.controllers', [
 
     } )
 
-.controller('FeedsCtrl', function($scope, $stateParams, $ionicSideMenuDelegate, $timeout,$http,$window,localStorageService) {
+.controller('FeedsCtrl', function($scope, $stateParams, $ionicSideMenuDelegate, $timeout,$http,$window,localStorageService,$cordovaLocalNotification,$ionicPlatform) {
+    $ionicPlatform.ready(function () {
     $ionicSideMenuDelegate.canDragContent(false);
     $scope.items = [];
     $scope.hasBeenOffline = false;
@@ -682,85 +685,114 @@ angular.module( 'starter.app.controllers', [
         }
     });
 
-    var baseurl = 'http://192.168.10.102/marketmasterclass/wp-json/feed-api/v1/feed';
+    var baseurl = 'http://192.168.10.247/marketmasterclass/wp-json/feed-api/v1/feed';
     var limit = 10;
     $scope.lastid = 0;
     $scope.page = 1;
     $scope.canLoadMore = true;
-    $scope.isEmpty = function (obj) {
-        for (var i in obj) if (obj.hasOwnProperty(i)) return false;
-        return true;
-    };
 
-    $scope.loadMoreData = function() {
-        $scope.doRefresh();
-    }
 
-    $scope.doRefresh = function() {
+        $scope.isEmpty = function (obj) {
+            for (var i in obj) if (obj.hasOwnProperty(i)) return false;
+            return true;
+        };
 
-        $http.get(baseurl + '/' + $scope.lastid + '/' + limit + '/' + $scope.page)
-        .success(function(data){
+        $scope.loadMoreData = function() {
+            $scope.doRefresh();
+        }
 
-            if(data.length<1){
-                $scope.canLoadMore = false;
-            }else{
-                angular.forEach(data, function(value, key) {
-                    $scope.items.push({
-                        id : value.ID,
-                        title : value.post_title,
-                        content : value.post_excerpt,
-                        thumbnail : value.post_thumbnail
-                    });
+        $scope.doRefresh = function() {
+
+            $http.get(baseurl + '/' + $scope.lastid + '/' + limit + '/' + $scope.page)
+            .success(function(data){
+
+                if(data.length<1){
+                    $scope.canLoadMore = false;
+                }else{
+                    angular.forEach(data, function(value, key) {
+                        $scope.items.push({
+                            id : value.ID,
+                            title : value.post_title,
+                            content : value.post_excerpt,
+                            thumbnail : value.post_thumbnail
+                        });
                         $scope.lastid = value.ID;
-                });
-                $scope.page++;
-                if($scope.page==2 ){
-                    $timeout(function(){
-                            $window.scrollTo(0, 0);
                     });
+                    $scope.page++;
+                    if($scope.page==2 ){
+                        $timeout(function(){
+                            $window.scrollTo(0, 0);
+                        });
+                    }
+
+
+                    localStorageService.set('news-data', $scope.items);
                 }
 
+                // $scope.items = data.query.results.quote;
+                $scope.$broadcast('scroll.refreshComplete');
+                $scope.$broadcast( 'scroll.infiniteScrollComplete' );
 
-                localStorageService.set('news-data', $scope.items);
-            }
+            }).error(function(){
 
-            // $scope.items = data.query.results.quote;
-            $scope.$broadcast('scroll.refreshComplete');
-            $scope.$broadcast( 'scroll.infiniteScrollComplete' );
+                var data = {};
+                if(data = localStorageService.get('news-data')){
 
-        }).error(function(){
+                    $scope.items = [];
+                    $scope.page = 1;
+                    $scope.lastid = 0;
+                    $scope.canLoadMore = true;
 
-            var data = {};
-            if(data = localStorageService.get('news-data')){
+                    $scope.items = data;
+                    $scope.lastid = data[data.length-1].id;
+                    $scope.page++;
 
-                $scope.items = [];
-                $scope.page = 1;
-                $scope.lastid = 0;
-                $scope.canLoadMore = true;
+                }else{
 
-                $scope.items = data;
-                $scope.lastid = data[data.length-1].id;
-                $scope.page++;
+                }
 
-            }else{
+                $scope.$broadcast('scroll.refreshComplete');
+                // $('.feed').fadeIn();
+            });
+        };
 
-            }
+        $scope.forceLoad = function(){
+            $scope.items = [];
+            $scope.page = 1;
+            $scope.lastid = 0;
+            $scope.canLoadMore = true;
+            $scope.doRefresh();
+        }
 
-            $scope.$broadcast('scroll.refreshComplete');
-            // $('.feed').fadeIn();
-        });
-    };
+        // Initial Load
+        // $scope.forceLoad();
 
-    $scope.forceLoad = function(){
-        $scope.items = [];
-        $scope.page = 1;
-        $scope.lastid = 0;
-        $scope.canLoadMore = true;
-        $scope.doRefresh();
-    }
 
-    // Initial Load
-    // $scope.forceLoad();
+
+        // Push Notifications
+
+
+        if (ionic.Platform.isWebView()) {
+            $scope.scheduleInstantNotification = function (message) {
+                var msg = 'Instant Notification';
+                if(message.length){
+                    msg = message;
+                }
+                $cordovaLocalNotification.schedule({
+                    id: 1,
+                    text: msg,
+                    title: 'Instant'
+                }).then(function () {
+                    alert("Instant Notification set");
+                });
+
+                console.log("Instant Notification set");
+            };
+
+            $scope.scheduleInstantNotification('Data Fetched : ' + (new Date()));
+        }
+    })
+
 })
 .controller( 'VenueCtrl', function ( $scope, $http, $ionicLoading,
     $cordovaGeolocation ) {
